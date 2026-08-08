@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 227" fill="none" role="img" aria-label="Property Finds">
+  <defs>
+    <linearGradient id="brandGradient" x1="141" y1="12" x2="141" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6e5fe0"/>
+      <stop offset="55%" stop-color="#5f52e3"/>
+      <stop offset="100%" stop-color="#5424cb"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="url(#brandGradient)">
+    <polygon points="22,96 38,96 38,60 46,48 46,96"/>
+    <polygon points="50,96 64,96 64,54 72,42 72,96"/>
+    <polygon points="76,96 90,96 90,50 98,38 98,96"/>
+    <polygon points="102,96 118,96 118,44 126,32 126,96"/>
+    <polygon points="130,96 148,96 148,36 158,20 158,96"/>
+    <polygon points="152,96 170,96 170,40 180,26 180,96"/>
+    <polygon points="174,96 192,96 192,46 202,34 202,96"/>
+    <polygon points="196,96 214,96 214,52 222,40 222,96"/>
+    <polygon points="218,96 236,96 236,58 244,46 244,96"/>
+  </g>
+
+  <g fill="#5424cb">
+    <rect x="156" y="10" width="2" height="12" rx="1"/>
+    <rect x="178" y="12" width="2" height="14" rx="1"/>
+  </g>
+
+  <text
+    x="141"
+    y="144"
+    text-anchor="middle"
+    fill="#5424cb"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="33"
+    font-weight="700"
+    letter-spacing="0.5"
+  >PROPERTY</text>
+  <text
+    x="141"
+    y="180"
+    text-anchor="middle"
+    fill="#5424cb"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="21"
+    font-weight="700"
+    letter-spacing="7"
+  >FINDS</text>
+</svg>
