@@ -1,11 +1,17 @@
 import type { Agent, BlogPost, Property, Testimonial } from './types'
 
 /**
- * Prefer NEXT_PUBLIC_API_URL; when the UI is opened via a LAN IP, use the same
- * host on port 8000 so phones/other devices can reach Django.
+ * Prefer NEXT_PUBLIC_API_URL (production Render URL, etc.).
+ * Only fall back to same-host:8000 when developing on a LAN IP against local Django.
  */
 function getApiBase() {
   const configured = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')
+  const configuredIsRemote =
+    !!configured && !configured.includes('127.0.0.1') && !configured.includes('localhost')
+
+  if (configuredIsRemote) {
+    return configured
+  }
 
   if (typeof window !== 'undefined') {
     const { protocol, hostname } = window.location
@@ -17,20 +23,15 @@ function getApiBase() {
 
   if (configured) return configured
 
-  if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location
-    return `${protocol}//${hostname}:8000/api`
-  }
-
   throw new Error(
-    'NEXT_PUBLIC_API_URL is not set. Add it to frontend/.env.local (e.g. http://127.0.0.1:8000/api).'
+    'NEXT_PUBLIC_API_URL is not set. Add it to frontend/.env.local (e.g. https://poperty-listing-backend.onrender.com/api).'
   )
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const base = getApiBase()
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 10000)
+  const timeout = setTimeout(() => controller.abort(), 20000)
   const method = (init?.method || 'GET').toUpperCase()
 
   try {
