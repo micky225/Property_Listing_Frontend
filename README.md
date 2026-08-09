@@ -1,60 +1,53 @@
 # Property Finds
 
-Monorepo with separately deployable **frontend** and **backend**.
+Monorepo with separately deployable frontend and backend.
 
 ```
 property-listing-website/
-├── frontend/     # Next.js → deploy this folder alone
-└── backend/      # Django → deploy this folder alone
-    ├── manage.py
-    ├── requirements.txt
-    ├── media/
-    ├── db.sqlite3
-    └── backend/  # Django project package (settings, urls, app)
+├── app/, components/, lib/, public/   # Next.js (Vercel) — repo root
+└── poperty-backend/                   # Django (Render) — also its own git repo
 ```
 
-## Local development
-
-### Backend
+## Frontend (local)
 
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py seed_data
-python manage.py runserver 0.0.0.0:8000
-```
-
-- API: http://127.0.0.1:8000/api/
-- Admin: http://127.0.0.1:8000/admin/
-
-You can also reuse the repo-root `.env` venv if you already created one:
-`source ../.env/bin/activate` from `backend/`.
-
-### Frontend
-
-```bash
-cd frontend
 cp .env.example .env.local
 npm install
 npm run dev
 ```
 
-- Site: http://localhost:3000
-- `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api`
+Env: `NEXT_PUBLIC_API_URL=https://poperty-listing-backend.onrender.com/api`
 
-## Deploy separately
+### Vercel
 
-### Frontend (e.g. Vercel)
+1. **Root Directory:** leave **empty** (Next.js is at the repo root)
+2. Env: `NEXT_PUBLIC_API_URL=https://poperty-listing-backend.onrender.com/api`
 
-1. Root Directory: `frontend`
-2. Env: `NEXT_PUBLIC_API_URL=https://YOUR-API-HOST/api`
+Deployed: https://property-listing-zeta-lime.vercel.app
 
-### Backend (e.g. Render / Railway / VPS)
+## Backend (local)
 
-1. Root Directory: `backend`
-2. Install: `pip install -r requirements.txt`
-3. Start: `gunicorn backend.wsgi:application`
-4. Env: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`, `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOW_ALL_ORIGINS=false`, `CORS_ALLOWED_ORIGINS=https://YOUR-FRONTEND-HOST`
+```bash
+cd poperty-backend
+source .env/bin/activate   # or python3 -m venv .env && pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_data
+python manage.py runserver 0.0.0.0:8000
+```
+
+### Render
+
+Deployed: https://poperty-listing-backend.onrender.com
+
+1. Root Directory: repo root of the backend service (`poperty-backend`)
+2. Build: `pip install -r requirements.txt`
+3. Start: `bash start.sh`  (migrates, seeds if empty, then gunicorn)
+4. Env (example in `poperty-backend/.env.example`):
+   - `DJANGO_SECRET_KEY`
+   - `DJANGO_DEBUG=false`
+   - `DJANGO_ALLOWED_HOSTS=poperty-listing-backend.onrender.com`
+   - `CORS_ALLOW_ALL_ORIGINS=false`
+   - `CORS_ALLOWED_ORIGINS=https://property-listing-zeta-lime.vercel.app,http://localhost:3000`
+   - `CSRF_TRUSTED_ORIGINS=https://property-listing-zeta-lime.vercel.app,https://poperty-listing-backend.onrender.com`
+
+**Note:** If you set `CORS_ALLOWED_ORIGINS` on Render, it overrides the defaults in `settings.py` — keep the Vercel URL in that env value.

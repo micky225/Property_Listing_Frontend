@@ -24,7 +24,7 @@ function getApiBase() {
   if (configured) return configured
 
   throw new Error(
-    'NEXT_PUBLIC_API_URL is not set. Add it to frontend/.env.local (e.g. https://poperty-listing-backend.onrender.com/api).'
+    'NEXT_PUBLIC_API_URL is not set. Add it to .env.local (e.g. https://poperty-listing-backend.onrender.com/api).'
   )
 }
 
