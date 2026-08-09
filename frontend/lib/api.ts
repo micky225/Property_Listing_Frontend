@@ -28,10 +28,15 @@ function getApiBase() {
   )
 }
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const base = getApiBase()
+function isRemoteApi(base: string) {
+  return base.startsWith('https://') || (!base.includes('127.0.0.1') && !base.includes('localhost'))
+}
+
+async function fetchOnce<T>(base: string, path: string, init?: RequestInit): Promise<T> {
+  // Render free tier can take 30–60s to wake from sleep
+  const timeoutMs = isRemoteApi(base) ? 60000 : 15000
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 20000)
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
   const method = (init?.method || 'GET').toUpperCase()
 
   try {
@@ -56,8 +61,29 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     }
 
     return await res.json()
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error(
+        `API timed out after ${timeoutMs / 1000}s (${path}). The Render backend may be waking up — refresh in a moment.`
+      )
+    }
+    throw err
   } finally {
     clearTimeout(timeout)
+  }
+}
+
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const base = getApiBase()
+
+  try {
+    return await fetchOnce<T>(base, path, init)
+  } catch (err) {
+    // One retry helps after a cold start on Render
+    if (isRemoteApi(base) && err instanceof Error && /timed out|Failed to fetch|NetworkError/i.test(err.message)) {
+      return await fetchOnce<T>(base, path, init)
+    }
+    throw err
   }
 }
 
